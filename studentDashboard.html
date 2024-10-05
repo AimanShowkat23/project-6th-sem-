@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="studentDashboard.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+  </head>
+  <body>
+    <!-- Hamburger menu button -->
+    <div class="menu-btn" id="menu-btn">
+      <div class="menu-bar"></div>
+      <div class="menu-bar"></div>
+      <div class="menu-bar"></div>
+    </div>
+
+    <!-- Sidebar menu -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <button class="sidebar-btn" id="editProfileBtn" onclick="window.location.href='editProfile.html'">
+          Edit Profile
+        </button>
+        <button class="sidebar-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <h1 id="welcomeMessage">Welcome, User</h1>
+
+      <!-- Table to display user information -->
+      <table id="userInfo" style="display: none">
+        <tr>
+          <th>IUST Registration Number</th>
+          <td id="iustRegNo"></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td id="email"></td>
+        </tr>
+        <tr>
+          <th>Bus Number</th>
+          <td id="busNumber"></td>
+        </tr>
+        <tr>
+          <th>Track My Bus</th>
+          <td>
+            <button class="btn-track-bus" id="trackBus">Track My Bus</button>
+          </td>
+        </tr>
+      </table>
+
+      <div id="map" style="width: 100%; height: 400px; display: none;"></div>
+
+      <!-- Edit Profile Form (Initially hidden) -->
+      <div id="editProfileForm" style="display: none">
+        <h2>Edit Profile</h2>
+        <form id="updateProfileForm">
+          <div class="input-box">
+            <label for="editName">Name</label>
+            <input type="text" id="editName" required />
+          </div>
+          <div class="input-box">
+            <label for="editBusNumber">Bus Number</label>
+            <input type="text" id="editBusNumber" required />
+          </div>
+          <button type="submit" class="btn">Update Profile</button>
+        </form>
+      </div>
+
+      <p id="status"></p>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+      import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+        authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+        projectId: "iust-7th-sem-projecet",
+        storageBucket: "iust-7th-sem-projecet.appspot.com",
+        messagingSenderId: "636728297769",
+        appId: "1:636728297769:web:453c44c23f62d43a204f38",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      let currentUser;
+
+      // Initialize Google Maps
+      let map;
+      let marker;
+
+      function initMap(latitude, longitude) {
+        const mapOptions = {
+          center: { lat: latitude, lng: longitude },
+          zoom: 15,
+        };
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        marker = new google.maps.Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map,
+        });
+      }
+
+      // Check if user is logged in and get user data
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          currentUser = user;
+          const uid = user.uid;
+          try {
+            const docRef = doc(db, "students", uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              document.getElementById("welcomeMessage").innerText = `Welcome, ${data.name}`;
+              document.getElementById("iustRegNo").innerText = data.registrationNumber;
+              document.getElementById("email").innerText = data.email;
+              document.getElementById("busNumber").innerText = data.busNumber;
+              document.getElementById("userInfo").style.display = "table";
+            } else {
+              document.getElementById("status").innerText = "No user data found!";
+            }
+          } catch (error) {
+            document.getElementById("status").innerText = `Error: ${error.message}`;
+          }
+        } else {
+          window.location.href = "studentSignIn.html";
+        }
+      });
+
+      // Track bus functionality
+      document.getElementById("trackBus").addEventListener("click", async () => {
+        try {
+          const busLocationRef = doc(db, "busLocations", "DRIVER_UID");  // Replace DRIVER_UID with actual driver ID
+          const busLocationSnap = await getDoc(busLocationRef);
+
+          if (busLocationSnap.exists()) {
+            const locationData = busLocationSnap.data();
+            const latitude = locationData.latitude;
+            const longitude = locationData.longitude;
+
+            document.getElementById("map").style.display = "block";
+            initMap(latitude, longitude);
+          } else {
+            alert("No bus location data found!");
+          }
+        } catch (error) {
+          alert(`Error fetching bus location: ${error.message}`);
+        }
+      });
+
+      // Edit Profile function
+      function editProfile() {
+        document.getElementById("userInfo").style.display = "none";
+        document.getElementById("editProfileForm").style.display = "block";
+        populateEditForm(); 
+      }
+
+      // Populate Edit Profile form
+      async function populateEditForm() {
+        const uid = currentUser.uid;
+        const docRef = doc(db, "students", uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById("editName").value = data.name;
+          document.getElementById("editBusNumber").value = data.busNumber;
+        } else {
+          document.getElementById("status").innerText = "Failed to retrieve user data for editing.";
+        }
+      }
+
+      // Update profile submission
+      document.getElementById("updateProfileForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const newName = document.getElementById("editName").value;
+        const newBusNumber = document.getElementById("editBusNumber").value;
+
+        try {
+          const uid = currentUser.uid;
+          const docRef = doc(db, "students", uid);
+          await updateDoc(docRef, { name: newName, busNumber: newBusNumber });
+          document.getElementById("status").innerText = "Profile updated successfully!";
+          document.getElementById("status").style.color = "green";
+          document.getElementById("userInfo").style.display = "table";
+          document.getElementById("editProfileForm").style.display = "none";
+        } catch (error) {
+          document.getElementById("status").innerText = `Error updating profile: ${error.message}`;
+          document.getElementById("status").style.color = "red";
+        }
+      });
+
+      // Toggle sidebar
+      document.getElementById("menu-btn").addEventListener("click", () => {
+        document.getElementById("sidebar").classList.toggle("active");
+      });
+
+      // Logout function
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "studentSignIn.html";
+        }).catch((error) => {
+          console.error("Error logging out:", error);
+        });
+      });
+    </script>
+  </body>
+</html>

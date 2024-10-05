@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Driver Login</title>
+    <link rel="stylesheet" href="busDriverSignIn.css">
+    <style>
+        /* Ensure the back arrow is placed inside the form and aligned properly */
+        .form-header {
+            position: relative;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .back-arrow {
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.168);
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            position: absolute;
+            left: -40px; /* Adjust position relative to the form */
+            top: 0;
+        }
+
+        .back-arrow:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .arrow-svg {
+            width: 24px;
+            height: 24px;
+            color: #007bff;
+        }
+
+        h2 {
+            flex-grow: 1;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Form Header with Back Arrow inside the form -->
+            <div class="form-header">
+                <!-- Back Arrow Button inside the form -->
+                <div class="back-arrow" onclick="window.location.href='./home.html'">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="arrow-svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </div>
+                <h2>Bus Driver Login</h2>
+            </div>
+
+            <form id="driverLoginForm">
+                <div class="input-box">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-box">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <div class="button-box">
+                    <button type="submit" class="btn">Sign In</button>
+                </div>
+                <p id="loginStatus"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+            authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+            projectId: "iust-7th-sem-projecet",
+            storageBucket: "iust-7th-sem-projecet.appspot.com",
+            messagingSenderId: "636728297769",
+            appId: "1:636728297769:web:453c44c23f62d43a204f38"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        document.getElementById('driverLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginStatus = document.getElementById('loginStatus');
+
+            try {
+                // Sign in with email and password
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const driver = userCredential.user;
+
+                // Step 1: Check if the user is a registered bus driver in Firestore (under buses collection)
+                const q = query(collection(db, "buses"), where("driverEmail", "==", email));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    // If no matching bus driver found, sign out and show an error
+                    loginStatus.innerText = "Access denied: Only registered bus drivers can sign in.";
+                    loginStatus.style.color = "red";
+                    await signOut(auth);  // Sign out if not authorized
+                } else {
+                    // Redirect to the bus driver dashboard if the user is a registered bus driver
+                    window.location.href = "busDriverDashboard.html";
+                }
+            } catch (error) {
+                loginStatus.innerText = `Error: ${error.message}`;
+                loginStatus.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

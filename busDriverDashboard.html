@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Driver Dashboard</title>
+    <link rel="stylesheet" href="busDriverDashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Bus Driver Dashboard</h1>
+        <p id="locationStatus">Location: Not shared yet</p>
+        <button id="startLocationBtn" class="btn">Start Sharing Location</button>
+        <button id="stopLocationBtn" class="btn" style="display:none;">Stop Sharing Location</button>
+        <p id="status"></p>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+            authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+            projectId: "iust-7th-sem-projecet",
+            storageBucket: "iust-7th-sem-projecet.appspot.com",
+            messagingSenderId: "636728297769",
+            appId: "1:636728297769:web:453c44c23f62d43a204f38"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser;
+        let watchId;
+
+        // Check if the driver is authenticated
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById("status").innerText = `Logged in as: ${user.email}`;
+            } else {
+                window.location.href = "busDriverSignIn.html";
+            }
+        });
+
+        // Function to share location
+        function shareLocation(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // Update location in Firestore for the current bus driver
+            setDoc(doc(db, "busLocations", currentUser.uid), {
+                latitude: latitude,
+                longitude: longitude,
+                timestamp: new Date()
+            });
+
+            document.getElementById("locationStatus").innerText = `Location: (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`;
+        }
+
+        // Start sharing location
+        document.getElementById("startLocationBtn").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(shareLocation, (error) => {
+                    document.getElementById("status").innerText = `Error: ${error.message}`;
+                }, { enableHighAccuracy: true });
+
+                document.getElementById("startLocationBtn").style.display = "none";
+                document.getElementById("stopLocationBtn").style.display = "inline-block";
+                document.getElementById("status").innerText = "Sharing location...";
+            } else {
+                document.getElementById("status").innerText = "Geolocation is not supported by this browser.";
+            }
+        });
+
+        // Stop sharing location
+        document.getElementById("stopLocationBtn").addEventListener("click", () => {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                document.getElementById("locationStatus").innerText = "Location: Not shared anymore";
+                document.getElementById("startLocationBtn").style.display = "inline-block";
+                document.getElementById("stopLocationBtn").style.display = "none";
+                document.getElementById("status").innerText = "Stopped sharing location.";
+            }
+        });
+
+        // Logout functionality
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "busDriverSignIn.html"; // Redirect to login page after logout
+            } catch (error) {
+                document.getElementById("status").innerText = `Error logging out: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

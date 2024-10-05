@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="adminSignIn.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <!-- Back Arrow Button inside the login-box -->
+            <div class="back-arrow" onclick="window.location.href='./home.html'">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="arrow-svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+
+            <h2>Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="input-box">
+                    <label for="adminEmail">Admin Email</label>
+                    <input type="email" id="adminEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="input-box">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter your password" required>
+                </div>
+                <div class="button-box">
+                    <button type="submit" class="btn">Sign In</button>
+                </div>
+                <p id="adminStatus"></p>
+            </form>
+        </div>
+    </div>
+
+
+  
+
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the necessary Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+            authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+            projectId: "iust-7th-sem-projecet",
+            storageBucket: "iust-7th-sem-projecet.appspot.com",
+            messagingSenderId: "636728297769",
+            appId: "1:636728297769:web:453c44c23f62d43a204f38"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Handle form submission for admin login
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();  // Prevent the form from submitting
+
+            const adminEmail = document.getElementById('adminEmail').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+
+            try {
+                // Sign in the user with email and password using Firebase Authentication
+                const userCredential = await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+                const user = userCredential.user;
+
+                // Check if the signed-in user is an admin by querying the 'admins' collection in Firestore
+                const adminDocRef = doc(db, 'admins', user.uid);
+                const adminDoc = await getDoc(adminDocRef);
+
+                if (adminDoc.exists()) {
+                    // Redirect the admin to the dashboard if the user is found in the 'admins' collection
+                    window.location.href = "adminDashboard.html";
+                } else {
+                    // Display an error message if the user is not an admin
+                    document.getElementById('adminStatus').innerText = "Unauthorized access: Not an admin!";
+                    document.getElementById('adminStatus').style.color = "red";
+                }
+            } catch (error) {
+                // Handle and display any errors that occur during sign-in
+                document.getElementById('adminStatus').innerText = `Error: ${error.message}`;
+                document.getElementById('adminStatus').style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

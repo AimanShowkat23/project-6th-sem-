@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="./adminDashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome to Admin Dashboard</h1>
+
+        <!-- Admin Dashboard Navigation Options -->
+        <div class="admin-actions">
+            <button onclick="window.location.href='manageStudents.html'" class="dashboard-btn">Manage Students</button>
+            <button onclick="window.location.href='manageBuses.html'" class="dashboard-btn">Manage Buses</button>
+           
+            <button id="logoutBtn" class="dashboard-btn">Logout</button>
+        </div>
+
+        <p id="adminStatus"></p>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+            authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+            projectId: "iust-7th-sem-projecet",
+            storageBucket: "iust-7th-sem-projecet.appspot.com",
+            messagingSenderId: "636728297769",
+            appId: "1:636728297769:web:453c44c23f62d43a204f38"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "adminSignIn.html";  // Redirect to admin login on logout
+            } catch (error) {
+                document.getElementById('adminStatus').innerText = `Error logging out: ${error.message}`;
+                document.getElementById('adminStatus').style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #0093E9, #80D0C7); /* Gradient background */
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.signup-box {
+    background-color: #00000093;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 600px;
+}
+
+h2 {
+    color: #007bff; /* Blue color for title */
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.input-box {
+    margin-bottom: 20px;
+}
+
+.input-box label {
+    display: block;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1304043c;
+    border: 1px solid #007bff;  /* Blue border */
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    color: white;
+}
+
+.input-box input:focus {
+    border-color: #0056b3;  /* Darker blue border on focus */
+}
+
+.button-box {
+    margin-top: 20px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+#status {
+    margin-top: 20px;
+    font-size:1rem;
+}

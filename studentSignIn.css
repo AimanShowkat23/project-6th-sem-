@@ -1,0 +1,176 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #0093E9, #80D0C7); /* Gradient background */
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+/* Modern Back Arrow (SVG) at Top Left */
+.back-arrow {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.168); 
+    padding: 10px;
+    display: inline-block;
+    line-height: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 50%;
+}
+
+.back-arrow:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.arrow-svg {
+    width: 24px;
+    height: 24px;
+    stroke: white; /* White arrow to match the design */
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.login-box {
+    background-color: #00000093;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 600px;
+    max-width: 90%;
+    text-align: center;
+    position: relative; /* Ensures the back arrow is positioned relative to the login box */
+}
+
+/* Title Styling */
+h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+/* Input Box Styling */
+.input-box {
+    margin-bottom: 20px;
+}
+
+.input-box label {
+    display: block;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1304043c;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    color: white;
+}
+
+.input-box input:focus {
+    border-color: #0056b3;
+}
+
+/* Button Section */
+.button-box {
+    margin-top: 20px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Forgot Password */
+.forgot-password {
+    display: block;
+    margin-top: 15px;
+    color: #ff5733;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-box {
+        width: 90%;
+        padding: 30px;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+    }
+
+    .btn {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .input-box input {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .forgot-password {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .input-box input {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .forgot-password {
+        font-size: 0.8rem;
+    }
+}

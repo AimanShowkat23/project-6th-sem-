@@ -1,0 +1,173 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #0093E9, #80D0C7); /* Gradient background */
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.login-box {
+    background-color: #00000093;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 600px;
+    max-width: 90%; /* Ensure it adjusts on smaller screens */
+    text-align: center;
+}
+
+/* Title Styling */
+h2 {
+    color: #007bff; /* Blue color for title */
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+/* Input Box Styling */
+.input-box {
+    margin-bottom: 20px;
+}
+
+.input-box label {
+    display: block;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1304043c;
+    border: 1px solid #007bff;  /* Blue border */
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    color: white;
+}
+
+.input-box input:focus {
+    border-color: #0056b3;  /* Darker blue border on focus */
+}
+
+/* Button Section Styling */
+.button-box {
+    margin-top: 20px;
+}
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Admin Status Message */
+#adminStatus {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-box {
+        width: 90%; /* Takes 90% of the width on smaller devices */
+        padding: 30px; /* Reduced padding on smaller screens */
+    }
+
+    h2 {
+        font-size: 1.8rem; /* Slightly smaller font for the title */
+    }
+
+    .btn {
+        padding: 10px; /* Smaller buttons on mobile */
+        font-size: 0.9rem; /* Slightly smaller text size for buttons */
+    }
+
+    .input-box input {
+        padding: 10px; /* Smaller padding for input fields */
+        font-size: 0.9rem; /* Adjust input text size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1.5rem; /* Even smaller title on extra small screens */
+    }
+
+    .btn {
+        padding: 8px; /* Smaller buttons on extra small screens */
+    }
+
+    .input-box input {
+        padding: 8px; /* Reduce padding for input fields on extra small screens */
+        font-size: 0.9rem; /* Smaller text size for input fields */
+    }
+}
+/* Position the back-arrow inside the login-box at top-left */
+.back-arrow {
+    position: absolute;
+    top: 20px; /* Adjust based on the form */
+    left: 20px; /* Adjust based on the form */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.168); /* Semi-transparent background */
+    border-radius: 50%;
+    padding: 10px;
+    display: inline-block;
+    line-height: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.back-arrow:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.arrow-svg {
+    width: 24px;
+    height: 24px;
+    stroke: white; /* White arrow for contrast */
+}
+
+/* Adjust position of login-box and other styles */
+.login-box {
+    position: relative; /* Relative positioning to place the arrow inside */
+    background-color: #00000093;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 600px;
+    max-width: 90%; /* Ensure it adjusts on smaller screens */
+    text-align: center;
+    margin: 0 auto; /* Centering the box */
+}
+

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="manageStudents.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Back Arrow Button at Top Left -->
+        <div class="back-arrow" onclick="window.location.href='./adminDashboard.html'">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="arrow-svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+        </div>
+
+        <h1>Manage Students</h1>
+
+        <!-- Form to add a new student -->
+        <div class="student-form">
+            <h2>Add New Student</h2>
+            <form id="addStudentForm">
+                <input type="text" id="studentName" placeholder="Student Name" required>
+                <input type="email" id="studentEmail" placeholder="Student Email" required>
+                <input type="text" id="studentRegNo" placeholder="Registration Number (e.g., IUST1234567890)" required>
+                <input type="text" id="studentBusNo" placeholder="Bus Number" required>
+                <button type="submit" class="btn">Add Student</button>
+            </form>
+            <p id="formStatus"></p>
+        </div>
+
+        <!-- Section to display all students -->
+        <div class="student-list">
+            <h2>All Students</h2>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Reg No</th>
+                        <th>Bus No</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- Dynamic rows will be added here via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal for editing bus number -->
+        <div id="editModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Edit Bus Number</h2>
+                <form id="editBusForm">
+                    <input type="text" id="editBusNo" placeholder="Enter new Bus Number" required>
+                    <button type="submit" class="btn">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Firebase SDK -->
+        <script type="module">
+            // Your existing Firebase SDK and JS code
+        </script>
+    </div>
+
+
+
+        <!-- Firebase SDK -->
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+            import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+            import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+            // Your Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+                authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+                projectId: "iust-7th-sem-projecet",
+                storageBucket: "iust-7th-sem-projecet.appspot.com",
+                messagingSenderId: "636728297769",
+                appId: "1:636728297769:web:453c44c23f62d43a204f38"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth(app);  // Initialize Firebase Auth
+
+            // Function to validate the registration number format
+            function validateRegNumber(regNumber) {
+                const prefix = regNumber.slice(0, 4);
+                const numericPart = regNumber.slice(4);
+                return regNumber.length === 14 && prefix === "IUST" && /^[0-9]+$/.test(numericPart);
+            }
+
+            // Add a new student to both Firebase Authentication and Firestore
+            document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const studentName = document.getElementById('studentName').value;
+                const studentEmail = document.getElementById('studentEmail').value;
+                const studentRegNo = document.getElementById('studentRegNo').value;
+                const studentBusNo = document.getElementById('studentBusNo').value;
+                const formStatus = document.getElementById('formStatus');
+
+                // Validate registration number
+                if (!validateRegNumber(studentRegNo)) {
+                    formStatus.innerText = "Error: Registration number must be 14 characters, start with 'IUST', and followed by 10 digits.";
+                    formStatus.style.color = 'red';
+                    return;
+                }
+
+                try {
+                    // Step 1: Create user in Firebase Authentication with a default password
+                    const defaultPassword = "defaultPassword123";  // Set a default password here
+                    const userCredential = await createUserWithEmailAndPassword(auth, studentEmail, defaultPassword);
+                    const user = userCredential.user;
+
+                    // Step 2: Store additional student data in Firestore under 'students' collection
+                    await setDoc(doc(db, 'students', user.uid), {
+                        name: studentName,
+                        email: studentEmail,
+                        registrationNumber: studentRegNo,
+                        busNumber: studentBusNo,
+                        uid: user.uid  // Store user UID for easy reference
+                    });
+
+                    formStatus.innerText = 'Student added successfully with a default password!';
+                    formStatus.style.color = 'green';
+
+                    console.log("Student added to Firebase Auth and Firestore!");
+
+                    // Clear form
+                    document.getElementById('addStudentForm').reset();
+
+                    // Refresh student list
+                    loadStudents();
+                } catch (error) {
+                    console.error("Error adding student:", error);
+                    formStatus.innerText = `Error: ${error.message}`;
+                    formStatus.style.color = 'red';
+                }
+            });
+
+            // Function to load students and display them in the table
+            async function loadStudents() {
+                const studentsSnapshot = await getDocs(collection(db, 'students'));
+                const studentsTableBody = document.getElementById('studentsTableBody');
+                studentsTableBody.innerHTML = ''; // Clear table
+
+                studentsSnapshot.forEach((doc) => {
+                    const student = doc.data();
+                    const studentRow = `
+                        <tr>
+                            <td>${student.name}</td>
+                            <td>${student.email}</td>
+                            <td>${student.registrationNumber}</td>
+                            <td>${student.busNumber}</td>
+                            <td>
+                                <button class="edit-btn" data-id="${doc.id}" data-busno="${student.busNumber}">Edit Bus</button>
+                                <button class="delete-btn" data-id="${doc.id}">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    studentsTableBody.innerHTML += studentRow;
+                });
+            }
+
+            window.onload = loadStudents;
+
+            // Use event delegation for edit and delete buttons
+            document.getElementById('studentsTableBody').addEventListener('click', async (e) => {
+                if (e.target.classList.contains('edit-btn')) {
+                    const studentId = e.target.getAttribute('data-id');
+                    const currentBusNo = e.target.getAttribute('data-busno');
+
+                    // Show modal and populate the current bus number
+                    const editModal = document.getElementById('editModal');
+                    const editBusNoInput = document.getElementById('editBusNo');
+                    editBusNoInput.value = currentBusNo;
+                    editModal.style.display = 'block';
+
+                    // Handle form submission for bus number update
+                    document.getElementById('editBusForm').addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        const newBusNo = document.getElementById('editBusNo').value;
+
+                        try {
+                            // Update the bus number in Firestore
+                            const studentRef = doc(db, 'students', studentId);
+                            await updateDoc(studentRef, {
+                                busNumber: newBusNo
+                            });
+                            alert('Bus number updated successfully!');
+                            loadStudents();  // Refresh student list
+                            editModal.style.display = 'none';  // Close modal
+                        } catch (error) {
+                            alert('Error updating bus number: ' + error.message);
+                        }
+                    });
+                }
+
+                if (e.target.classList.contains('delete-btn')) {
+                    const studentId = e.target.getAttribute('data-id');
+                    const confirmation = confirm("Are you sure you want to delete this student?");
+                    if (confirmation) {
+                        try {
+                            await deleteDoc(doc(db, 'students', studentId));
+                            alert('Student deleted successfully!');
+                            loadStudents();  // Refresh student list
+                        } catch (error) {
+                            alert('Error deleting student: ' + error.message);
+                        }
+                    }
+                }
+            });
+
+            // Close the modal
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('editModal').style.display = 'none';
+            });
+
+            // Close modal if clicked outside of it
+            window.onclick = function(event) {
+                const editModal = document.getElementById('editModal');
+                if (event.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            };
+        </script>
+    </div>
+</body>
+</html>

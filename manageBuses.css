@@ -1,0 +1,276 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #0093E9, #80D0C7); /* Gradient background */
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Container */
+.container {
+    background-color: #00000093;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 1200px;
+    text-align: center;
+}
+
+/* Titles */
+h1, h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+/* Form Styles */
+.bus-form {
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.bus-form input {
+    width: 100%;
+    padding: 12px;
+    background-color: #1304043c;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.bus-form input:focus {
+    border-color: #0056b3;
+}
+
+.bus-form .btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.bus-form .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Table Styles */
+.bus-list {
+    margin-top: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+table th, table td {
+    padding: 15px;
+    border: 1px solid #007bff;
+    color: white;
+}
+
+table th {
+    background-color: #007bff;
+    font-size: 1.1rem;
+}
+
+table td {
+    background-color: #1304043c;
+    font-size: 1rem;
+}
+
+.change-driver-btn, .delete-bus-btn {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.change-driver-btn:hover, .delete-bus-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #00000093;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #007bff;
+    background-color: #1304043c;
+    color: white;
+    border-radius: 5px;
+    outline: none;
+}
+
+.modal-content .btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.modal-content .btn:hover {
+    background-color: #0056b3;
+}
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ff0000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 30px;
+    }
+
+    h1, h2 {
+        font-size: 1.8rem;
+    }
+
+    .btn {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .bus-form input, .modal-content input {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    table th, table td {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+
+    .bus-form input, .modal-content input {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+}
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(to right, #0093E9, #80D0C7);
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+/* Modern Back Arrow (SVG) at Top Left */
+.back-arrow {
+    position: absolute;
+    top: 15px;
+    left: 15px; /* Adjusted to top-left corner */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.168); /* Semi-transparent dark background */
+    border-radius: 50%;
+    padding: 10px;
+    display: inline-block;
+    line-height: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.back-arrow:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.arrow-svg {
+    width: 24px;
+    height: 24px;
+    stroke: white; /* White arrow for visibility */
+}
+
+/* Container */
+.container {
+    background-color: #00000093;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 80%;
+    max-width: 90%;
+    text-align: center;
+    position: relative;
+}
+
+/* Title Styling */
+h1 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}

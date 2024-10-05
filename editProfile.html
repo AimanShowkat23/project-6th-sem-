@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="editProfile.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Back Arrow Button at Top Left -->
+      <div
+        class="back-arrow"
+        onclick="window.location.href='./studentDashboard.html'"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2.5"
+          stroke="currentColor"
+          class="arrow-svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </div>
+
+      <h2>Edit Profile</h2>
+
+      <!-- Edit Profile Form -->
+      <form id="editProfileForm">
+        <div class="input-box">
+          <label for="editName">Name</label>
+          <input type="text" id="editName" required />
+        </div>
+        <div class="input-box">
+          <label for="editBusNumber">Bus Number</label>
+          <input type="text" id="editBusNumber" required />
+        </div>
+        <button type="submit" class="btn">Update Profile</button>
+      </form>
+<br>
+      <h3 style="color: #007bff; font-size: 25px;" >Change Password</h3><br>
+
+      <!-- Change Password Form -->
+      <form id="changePasswordForm">
+        <div class="input-box">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" required />
+        </div>
+        <div class="input-box">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" required />
+        </div>
+        <div class="input-box">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" required />
+        </div>
+        <button type="submit" class="btn">Change Password</button>
+      </form>
+
+      <p id="status"></p>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        reauthenticateWithCredential,
+        EmailAuthProvider,
+        updatePassword,
+      } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBQ5wNh7wfCEuta5B1svjdGC7C8mNtmcc4",
+        authDomain: "iust-7th-sem-projecet.firebaseapp.com",
+        projectId: "iust-7th-sem-projecet",
+        storageBucket: "iust-7th-sem-projecet.appspot.com",
+        messagingSenderId: "636728297769",
+        appId: "1:636728297769:web:453c44c23f62d43a204f38",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      let currentUser;
+
+      // Check if user is logged in and get user data
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          currentUser = user;
+          const uid = user.uid;
+          try {
+            // Get the user data from Firestore
+            const docRef = doc(db, "students", uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              document.getElementById("editName").value = data.name;
+              document.getElementById("editBusNumber").value = data.busNumber;
+            } else {
+              document.getElementById("status").innerText =
+                "No user data found!";
+            }
+          } catch (error) {
+            document.getElementById(
+              "status"
+            ).innerText = `Error: ${error.message}`;
+          }
+        } else {
+          // User is not signed in, redirect to login page
+          window.location.href = "studentSignIn.html";
+        }
+      });
+
+      // Handle profile update form submission
+      document
+        .getElementById("editProfileForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const newName = document.getElementById("editName").value;
+          const newBusNumber = document.getElementById("editBusNumber").value;
+
+          try {
+            const uid = currentUser.uid;
+            const docRef = doc(db, "students", uid);
+            await updateDoc(docRef, {
+              name: newName,
+              busNumber: newBusNumber,
+            });
+
+            document.getElementById("status").innerText =
+              "Profile updated successfully!";
+            document.getElementById("status").style.color = "green";
+          } catch (error) {
+            document.getElementById(
+              "status"
+            ).innerText = `Error updating profile: ${error.message}`;
+            document.getElementById("status").style.color = "red";
+          }
+        });
+
+      // Handle password change form submission
+      document
+        .getElementById("changePasswordForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const currentPassword =
+            document.getElementById("currentPassword").value;
+          const newPassword = document.getElementById("newPassword").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          // Check if new password and confirm password match
+          if (newPassword !== confirmPassword) {
+            document.getElementById("status").innerText =
+              "Error: New Password and Confirm Password do not match!";
+            document.getElementById("status").style.color = "red";
+            return;
+          }
+
+          try {
+            // Re-authenticate the user
+            const credential = EmailAuthProvider.credential(
+              currentUser.email,
+              currentPassword
+            );
+            await reauthenticateWithCredential(currentUser, credential);
+
+            // Update the password
+            await updatePassword(currentUser, newPassword);
+            document.getElementById("status").innerText =
+              "Password changed successfully!";
+            document.getElementById("status").style.color = "green";
+          } catch (error) {
+            document.getElementById(
+              "status"
+            ).innerText = `Error changing password: ${error.message}`;
+            document.getElementById("status").style.color = "red";
+          }
+        });
+    </script>
+  </body>
+</html>
